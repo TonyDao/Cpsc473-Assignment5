@@ -40,12 +40,13 @@ var main = function() {
             var answer = $('#answer').val();
             var result;
 
-            var jsonData = JSON.stringify({answer: answer, answerId: answerId});
+            var jsonData = JSON.stringify({'answer': answer, 'answerId': answerId});
 
             $.ajax({
                 url     : '/answer',
                 method  : 'POST',
                 dataType: 'json',
+                contentType: 'application/json',
                 data    : jsonData,
                 success : function(data) {
                     result = data.correct ? 'True':'False';
@@ -89,12 +90,15 @@ var main = function() {
             var question = $('#createQuestion').val(),
                 answer = $('#createAnswer').val();
 
-            var jsonData = JSON.stringify({question: question, answer: answer});
+            var jsonData = JSON.stringify({'question': question, 'answer': answer});
+
+            console.log(jsonData);
             
             $.ajax({
                 url     : '/question',
                 method  : 'POST',
                 dataType: 'json',
+                contentType: 'application/json',
                 data    : jsonData,
                 success : function(data) {
                     $('.ui.segment.answer h3 span').html(data.result);

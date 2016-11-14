@@ -1,6 +1,7 @@
 /* jshint browser: true, jquery: true, camelcase: true, indent: 2, undef: true, quotmark: single, maxlen: 80, trailing: true, curly: true, eqeqeq: true, forin: true, immed: true, latedef: true, newcap: true, nonew: true, unused: true, strict: true */
 
 var express = require('express'),
+    bodyParser = require('body-parser'),
     http = require('http'),
     mongoose = require('mongoose'),
     redis = require('redis'),
@@ -8,6 +9,12 @@ var express = require('express'),
 
 // set up a static file directory to use for default routing
 app.use(express.static(__dirname + '/public'));
+
+//parse application/json
+app.use(bodyParser.json());
+
+// create application/x-www-form-urlencoded parser
+app.use(bodyParser.urlencoded({'extended': false}));
 
 // create redis client and set right and wrong to default 0
 var redisClient = redis.createClient();
@@ -75,36 +82,34 @@ app.get('/question', function(req, res) {
 
 // post request for create question
 app.post('/question', function(req, res) {
-    var jsonObj;
+    var jsonObj,
+        newQuestion;
 
-    var newQuestion;
+    jsonObj = req.body;
 
-    req.on('data', function (data) {
-        jsonObj = JSON.parse(data);
+    getCount(function(err, count) {
+        if(err) {
+            console.log(err);
+        } else {
+            //create new question
+            newQuestion = new Question({
+                'question'  : jsonObj.question,
+                'answerId'  : count + 1,
+                'answer'    : jsonObj.answer
+            });
 
-        getCount(function(err, count) {
-            if(err) {
-                console.log(err);
-            } else {
-                //create new question
-                newQuestion = new Question({
-                    'question'  : jsonObj.question,
-                    'answerId'  : count + 1,
-                    'answer'    : jsonObj.answer
-                });
-
-                //save new question
-                newQuestion.save(function (err) {
-                    if (err !== null) {
-                        console.log('ERROR: ' + err);
-                    } else {
-                        console.log('the object was saved!');
-                        return res.json({result: 'question saved'});
-                    }
-                });
-            }            
-        });
+            //save new question
+            newQuestion.save(function (err) {
+                if (err !== null) {
+                    console.log('ERROR: ' + err);
+                } else {
+                    console.log('the object was saved!');
+                    return res.json({result: 'question saved'});
+                }
+            });
+        }            
     });
+    
 });
 
 // post request for send answer
@@ -114,41 +119,39 @@ app.post('/answer', function(req, res) {
         answer,
         correct;
 
-    req.on('data', function (data) {
-        jsonObj = JSON.parse(data);
-        answerId = parseInt(jsonObj.answerId, 10);
-        answer = jsonObj.answer;
+    jsonObj = req.body;
+    answerId = parseInt(jsonObj.answerId, 10);
+    answer = jsonObj.answer;
 
-        Question.findOne({'answerId': answerId}, function(err, result) {
-            //error of getting question
-            if (err !== null) {
-                console.log('ERROR: ' + err);
-            } 
-            //find matching answerId
-            else {
-                if (answer === result.answer) {
-                    correct = true;
-                    redisClient.incr('right', function(err, value) {
-                        if (err) {
-                            console.log('ERROR: increase right. '+ err);
-                        } else {
-                            console.log('right: ' + value);
-                        }
-                    });
-                } else {
-                    correct = false;
-                    redisClient.incr('wrong', function(err, value) {
-                        if (err) {
-                            console.log('ERROR: increase wrong. '+ err);
-                        } else {
-                            console.log('wrong: ' + value);
-                        }
-                    });
-                }
-                return res.json({correct: correct});
+    Question.findOne({'answerId': answerId}, function(err, result) {
+        //error of getting question
+        if (err !== null) {
+            console.log('ERROR: ' + err);
+        } 
+        //find matching answerId
+        else {
+            if (answer === result.answer) {
+                correct = true;
+                redisClient.incr('right', function(err, value) {
+                    if (err) {
+                        console.log('ERROR: increase right. '+ err);
+                    } else {
+                        console.log('right: ' + value);
+                    }
+                });
+            } else {
+                correct = false;
+                redisClient.incr('wrong', function(err, value) {
+                    if (err) {
+                        console.log('ERROR: increase wrong. '+ err);
+                    } else {
+                        console.log('wrong: ' + value);
+                    }
+                });
             }
-        });        
-    });
+            return res.json({correct: correct});
+        }
+    });  
 });
 
 // get request for score numbers
