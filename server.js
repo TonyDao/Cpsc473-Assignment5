@@ -120,6 +120,7 @@ app.post('/answer', function(req, res) {
         correct;
 
     jsonObj = req.body;
+    console.log(req.body);
     answerId = parseInt(jsonObj.answerId, 10);
     answer = jsonObj.answer;
 

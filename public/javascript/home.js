@@ -1,3 +1,5 @@
+var socket = io.connect('http://localhost:8080');
+
 var main = function() {
     'use strict';
 
@@ -14,6 +16,10 @@ var main = function() {
                     $('#game-form').transition('fade down');
                     //display username on header
                     $('#game-form h2 span').html(username);
+                    //send new user have connected
+                    socket.emit('new user', {username: username});
+                    //get score
+                    socket.emit('score');
                 }
             });            
         }
@@ -44,18 +50,6 @@ var main = function() {
         }
     });
 
-    //get random question
-    var getQuestion = function() {
-        $.get('/question', function(data) {
-            if (data) {
-                $('#question').html(data.question);
-                answerId = data.answerId;
-            } else {
-                console.log('No question');
-            }
-        });
-    };
-
     //get next question
     $('#getQuestionButton').on('click', function() {
         //prevent form to reload page
@@ -64,7 +58,9 @@ var main = function() {
                 return false;
             }
         });
-        getQuestion();
+
+        //send request for new quetsion
+        socket.emit('get question');
     });
 
     //answer button clicked
@@ -86,22 +82,10 @@ var main = function() {
                 var answer = $('#answer').val();
                 var result;
 
-                var jsonData = JSON.stringify({'answer': answer, 'answerId': answerId});
-
-                $.ajax({
-                    url     : '/answer',
-                    method  : 'POST',
-                    dataType: 'json',
-                    contentType: 'application/json',
-                    data    : jsonData,
-                    success : function(data) {
-                        result = data.correct ? 'True':'False';
-                        $('.ui.segment.answer h3 span').html(result);
-                    },
-                    error   : function() {
-                        console.log('Error post answer');
-                    }
-                });            
+                var jsonData = {answer: answer, answerId: answerId};
+                console.log(jsonData);
+                socket.emit('answer', jsonData);
+                
 
                 //remove question and answer
                 $('#answer').val('');
@@ -173,6 +157,63 @@ var main = function() {
             }
         });
     });
+
+        //update new user logined in
+        socket.on('get users', function(data){
+            var user;
+            console.log(data);
+
+            //remove list
+            $('#usersList').empty();
+
+            //add new users list
+            for(var i=0; i<data.length; i++) {
+                user = $('<div class="item">' + data[i].username + '</div>');
+                $('#usersList').append(user);
+            }
+        });
+
+        //update new question
+        socket.on('new question', function(data) {
+            console.log(data);
+            if(data) {
+                $('#question span').html(data.question);
+                answerId = data.answerId;
+            } else {
+                $('#question span').html("No question on DB");
+            } 
+        });
+
+        //display user answers
+        socket.on('check answer', function(data) {
+            console.log(data);
+
+            var currentAnswer = $('<div class="ui segment">');
+
+            var content = '<h3 class="ui header">' + data.answerer + ' answered: ';
+
+            console.log(data.correct);
+            if(data.correct === true) {
+                content += '<span class="ui green header">Correct</span></h3>';
+            } else {
+                content += '<span class="ui red header">Incorrect</span></h3>';
+            }
+            content += '</div>';
+            currentAnswer.append(content);
+
+            $('#displayAnswer').append(currentAnswer);
+            currentAnswer.hide();
+            currentAnswer.fadeIn();
+        });        
+
+        //update score
+        socket.on('update score', function(data){
+            $('#right span').html(data.right);
+            $('#wrong span').html(data.wrong);
+        });
+
+
+    
 };
 
 

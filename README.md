@@ -12,4 +12,8 @@ foreman start
 ```sh
 node server.js
 ```
+4) Open another ssh terminal and run socket.io:
+```sh
+node socketIO.js
+```
 The server is running on localhost:3000
