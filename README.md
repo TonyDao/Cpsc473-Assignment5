@@ -4,15 +4,15 @@
 ```sh
 npm install
 ```
-2) open run foreman to run all necessary applications.
+2) run foreman to run all necessary applications.
 ```sh
 foreman start
 ```
 foreman run:
-	* mongoseDB
-	* redis
-	* node server.js
-	* node socketIO.js
+* mongoseDB
+* redis
+* node server.js
+* node socketIO.js
 
 The server is running on localhost:3000
 
