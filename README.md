@@ -2,11 +2,11 @@
 ####How to execute program:
 1) Install node_modules:
 ```sh
-npm install
+$ npm install
 ```
 2) run foreman to run all necessary applications.
 ```sh
-foreman start
+$ foreman start
 ```
 foreman run:
 * mongoseDB
