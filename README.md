@@ -4,16 +4,16 @@
 ```sh
 npm install
 ```
-2) open a new terminal and connect over ssh and run redis and mongodb
+2) open run foreman to run all necessary applications.
 ```sh
 foreman start
 ```
-3) Open another ssh terminal and run server:
-```sh
-node server.js
-```
-4) Open another ssh terminal and run socket.io:
-```sh
-node socketIO.js
-```
+foreman run:
+	* mongoseDB
+	* redis
+	* node server.js
+	* node socketIO.js
+
 The server is running on localhost:3000
+
+the socket.io running on localhost:8080
