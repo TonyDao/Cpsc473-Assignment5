@@ -31,7 +31,6 @@ var main = function() {
     var previousTab = $('.ui.tab.active.segment');
     $('.vertical.pointing.menu .item').tab({
         'onLoad': function(e){
-			e.preventDefault();
             var currentTab = $('.ui.tab.active.segment');
             //hide current and show prevous to allow animate
             currentTab.hide();
@@ -149,15 +148,9 @@ var main = function() {
     });
 
     //score tab pressed
-    $('.ui.top.tabular.menu a:nth-child(3)').on('click',function() {
-        $.get('/score', function(data) {
-            if (data) {
-                $('#right span').html(data.right);
-                $('#wrong span').html(data.wrong);
-            } else {
-                console.log('Error: no data');
-            }
-        });
+    $('.ui.vertical.pointing.menu a:nth-child(3)').on('click',function() {
+        //get score
+        socket.emit('score');
     });
 
         //update new user logined in
@@ -210,6 +203,8 @@ var main = function() {
 
         //update score
         socket.on('update score', function(data){
+            console.log(data);
+            console.log(data.right);
             $('#right span').html(data.right);
             $('#wrong span').html(data.wrong);
         });
