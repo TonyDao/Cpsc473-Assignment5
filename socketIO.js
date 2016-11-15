@@ -15,31 +15,34 @@ var users =[],
 
 //option for http request
 var getOption = function(path) {
+	'use strict';
     var option = {
         uri: 'http://localhost:3000' + path,
         method: 'GET',
         headers: {
-            accept: "application/json",
-            "content-type": "application/json"
+            accept: 'application/json',
+            'content-type': 'application/json'
         }
     }; 
     return option;
 };
 
 var postOption = function (path, data) {
+	'use strict';
     var option = {
         uri: 'http://localhost:3000' + path,
         method: 'POST',
         headers: {
-            "content-type": "application/json"
+            'content-type': 'application/json'
         },
         json: data
     }; 
     return option;
-}
+};
 
 //socket io connection
 io.sockets.on('connection', function(socket){
+	'use strict';
     //connect client socket
     connections.push(socket);
     console.log('Connected sockets: %s', connections.length);
@@ -99,7 +102,7 @@ io.sockets.on('connection', function(socket){
     });
 
     //disconnect
-    socket.on('disconnect', function(data) {
+    socket.on('disconnect', function() {
         //disconnect user
         users.splice(users.indexOf(socket.username),1);
         console.log('Disconnect socket: %s', socket.username);

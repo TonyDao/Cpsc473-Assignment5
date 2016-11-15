@@ -36,6 +36,7 @@ var Question = mongoose.model('Question', questionSchema);
 
 //function to get the number of question
 var getCount = function (callback) {
+	'use strict';
     Question.count({}, function(err, count) {
         if (err) {
             return callback(err);
@@ -47,6 +48,7 @@ var getCount = function (callback) {
 
 //get question
 app.get('/question', function(req, res) {
+	'use strict';
     var randomID,
         jsonQuestion;
 
@@ -82,6 +84,7 @@ app.get('/question', function(req, res) {
 
 // post request for create question
 app.post('/question', function(req, res) {
+	'use strict';
     var jsonObj,
         newQuestion;
 
@@ -114,6 +117,7 @@ app.post('/question', function(req, res) {
 
 // post request for send answer
 app.post('/answer', function(req, res) {
+	'use strict';
     var jsonObj,
         answerId,
         answer,
@@ -157,6 +161,7 @@ app.post('/answer', function(req, res) {
 
 // get request for score numbers
 app.get('/score', function(req, res) {
+	'use strict';
     var right, wrong;
 
     redisClient.mget(['right','wrong'], function (err, results) {

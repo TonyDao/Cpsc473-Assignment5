@@ -7,7 +7,7 @@ var main = function() {
     $('#loginButton').on('click', function(e) {
         e.preventDefault();
         var username = $('#username').val();
-        if(username != '') {
+        if(username !== '') {
             //disable login-form
             $('#login-form').transition({
                 animation: 'fade up',
@@ -31,6 +31,7 @@ var main = function() {
     var previousTab = $('.ui.tab.active.segment');
     $('.vertical.pointing.menu .item').tab({
         'onLoad': function(e){
+			e.preventDefault();
             var currentTab = $('.ui.tab.active.segment');
             //hide current and show prevous to allow animate
             currentTab.hide();
@@ -120,8 +121,9 @@ var main = function() {
         onSuccess: function(){
             var question = $('#createQuestion').val(),
                 answer = $('#createAnswer').val();
+				jsonObj = {'question': question, 'answer': answer};
 
-            var jsonData = JSON.stringify({'question': question, 'answer': answer});
+            var jsonData = JSON.stringify(jsonObj);
 
             console.log(jsonData);
             
@@ -180,7 +182,7 @@ var main = function() {
                 $('#question span').html(data.question);
                 answerId = data.answerId;
             } else {
-                $('#question span').html("No question on DB");
+                $('#question span').html('No question on DB');
             } 
         });
 
